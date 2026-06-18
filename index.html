@@ -22,19 +22,26 @@
     ::selection{background:#c9a063;color:#0b0a09;}
     @keyframes lbIn{from{opacity:0}to{opacity:1}}
     @keyframes lbImg{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
+    /* Nav responsive: en celular la marca va arriba y las regiones + idiomas abajo */
+    @media (max-width:680px){
+      .site-nav{flex-wrap:wrap; gap:10px 0 !important;}
+      .nav-brand{font-size:16px !important;}
+      .nav-links{width:100%; flex-wrap:wrap; justify-content:center; gap:10px 16px !important; font-size:12px !important; letter-spacing:0.1em !important;}
+      .nav-autora{display:none !important;}
+    }
   </style>
 </helmet>
 <div style="background:#0b0a09; color:#e8e4dd; font-family:'Archivo',sans-serif; -webkit-font-smoothing:antialiased; min-height:100vh; width:100%; overflow-x:hidden;">
 
-  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:14px clamp(20px,5vw,56px); background:rgba(11,10,9,0.72); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid rgba(232,228,221,0.08);">
-    <a href="#top" style="text-decoration:none; color:#e8e4dd; font-family:'Cormorant Garamond',serif; font-size:18px; letter-spacing:0.01em; white-space:nowrap;">Geografías de la memoria</a>
-    <div style="display:flex; align-items:center; gap:clamp(14px,2.4vw,30px); font-size:12px; letter-spacing:0.12em; text-transform:uppercase;">
+  <nav class="site-nav" style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:14px clamp(20px,5vw,56px); background:rgba(11,10,9,0.72); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid rgba(232,228,221,0.08);">
+    <a href="#top" class="nav-brand" style="text-decoration:none; color:#e8e4dd; font-family:'Cormorant Garamond',serif; font-size:18px; letter-spacing:0.01em; white-space:nowrap;">Geografías de la memoria</a>
+    <div class="nav-links" style="display:flex; align-items:center; gap:clamp(14px,2.4vw,30px); font-size:12px; letter-spacing:0.12em; text-transform:uppercase;">
       <a href="#muestra" style="text-decoration:none; color:#9a948a; display:none;" class="nv">{{ t.navMuestra }}</a>
       <a href="#quebrada" style="text-decoration:none; color:#9a948a;">Quebrada</a>
       <a href="#yungas" style="text-decoration:none; color:#9a948a;">Yungas</a>
       <a href="#puna" style="text-decoration:none; color:#9a948a;">Puna</a>
-      <a href="#autora" style="text-decoration:none; color:#9a948a;">{{ t.navAutora }}</a>
-      <div style="display:flex; align-items:center; gap:7px; padding-left:clamp(8px,1.5vw,16px); border-left:1px solid rgba(232,228,221,0.12);">
+      <a href="#autora" class="nav-autora" style="text-decoration:none; color:#9a948a;">{{ t.navAutora }}</a>
+      <div class="nav-lang" style="display:flex; align-items:center; gap:7px; padding-left:clamp(8px,1.5vw,16px); border-left:1px solid rgba(232,228,221,0.12);">
         <button type="button" onClick="{{ fn.setEs }}" style="background:none; border:none; cursor:pointer; padding:0; font-family:'Archivo',sans-serif; font-size:12px; letter-spacing:0.12em; color: {{ esColor }};">ES</button>
         <span style="color:#4d4843;">/</span>
         <button type="button" onClick="{{ fn.setEn }}" style="background:none; border:none; cursor:pointer; padding:0; font-family:'Archivo',sans-serif; font-size:12px; letter-spacing:0.12em; color: {{ enColor }};">EN</button>
@@ -220,7 +227,8 @@ class Component extends DCLogic {
   groups = [
     { name: 'Saberes de la Quebrada', initials: 'SQ', url: 'https://saberesdelaquebrada.com.ar' },
     { name: 'Red de Turismo Rural Valles de Altura', initials: 'VA', url: 'https://turismoruralvallesdealtura.com.ar' },
-    { name: 'Turismo Rural Maimará', initials: 'TM', url: 'https://turismoruralmaimara.com.ar' }
+    { name: 'Turismo Rural Maimará', initials: 'TM', url: 'https://turismoruralmaimara.com.ar' },
+    { name: 'Kippus Tejidos Andinos', initials: 'KP', url: 'https://www.instagram.com/kippus_/' }
   ];
 
   copy = {
