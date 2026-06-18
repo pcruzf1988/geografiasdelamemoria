@@ -46,6 +46,9 @@
     .embla__btn:hover{border-color:#c9a063;}
     .embla__btn--prev{left:12px;} .embla__btn--next{right:12px;}
     @media (max-width:680px){ .embla__slide{flex:0 0 92%; height:clamp(300px,56vh,460px);} .embla__btn{display:none;} }
+    /* Tiras horizontales por localidad: scrollbar oculta, todas las fotos en una fila */
+    .loc-strip{scrollbar-width:none;}
+    .loc-strip::-webkit-scrollbar{height:0; display:none;}
   </style>
 </helmet>
 <div style="background:#0b0a09; color:#e8e4dd; font-family:'Archivo',sans-serif; -webkit-font-smoothing:antialiased; min-height:100vh; width:100%; overflow-x:hidden;">
@@ -116,7 +119,7 @@
                   <div class="embla__slide" onClick="{{ shot.open }}">
                     <div class="embla__parallax">
                       <div class="embla__parallax__layer">
-                        <img src="{{ shot.src }}" alt="{{ shot.alt }}" decoding="async" onError="{{ fn.imgError }}" />
+                        <img src="{{ shot.src }}" alt="{{ shot.alt }}" loading="lazy" decoding="async" onError="{{ fn.imgError }}" />
                       </div>
                     </div>
                     <div class="embla__cap"><div class="k">{{ shot.region }}</div><div class="n">{{ shot.locality }}</div></div>
@@ -139,9 +142,9 @@
               <h3 style="font-family:'Cormorant Garamond',serif; font-weight:400; font-size:clamp(22px,2.6vw,30px); line-height:1; margin:0; color:#e8e4dd;">{{ loc.name }}</h3>
               <span style="font-family:'Courier New',monospace; font-size:11px; color:#6f6a61; letter-spacing:0.06em;">{{ loc.count }}</span>
             </div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(clamp(118px,21vw,176px),1fr)); gap:10px;">
+            <div class="loc-strip" style="display:flex; gap:10px; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; padding-bottom:8px;">
               <sc-for list="{{ loc.photos }}" as="photo" hint-placeholder-count="6">
-                <button type="button" onClick="{{ photo.open }}" aria-label="{{ photo.alt }}" style="position:relative; width:100%; aspect-ratio:1; margin:0; padding:0; border:none; cursor:pointer; display:block; overflow:hidden; background:#141210;">
+                <button type="button" onClick="{{ photo.open }}" aria-label="{{ photo.alt }}" style="position:relative; flex:0 0 clamp(112px,27vw,170px); aspect-ratio:1; scroll-snap-align:start; margin:0; padding:0; border:none; cursor:pointer; display:block; overflow:hidden; background:#141210;">
                   <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#1a1714 0,#1a1714 9px,#15120f 9px,#15120f 18px);"></div>
                   <img src="{{ photo.src }}" alt="{{ photo.alt }}" loading="lazy" decoding="async" onError="{{ fn.imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:brightness(0.9); transition:transform 0.5s ease, filter 0.5s ease;" style-hover="transform:scale(1.05); filter:brightness(1.04);" />
                 </button>
@@ -259,12 +262,6 @@ class Component extends DCLogic {
   // Nombres lindos para carpetas con mayúsculas raras.
   locNames = { HOrnocal: 'Hornocal', OCUMAZO: 'Ocumazo', Pucara: 'Pucará' };
 
-  // Fotos mostradas por localidad en cada visita (selección aleatoria).
-  perLocality = 4;
-
-  // Fotos en el carrusel parallax (showcase) de cada región.
-  featuredCount = 6;
-
   groups = [
     { name: 'Saberes de la Quebrada', initials: 'SQ', url: 'https://saberesdelaquebrada.com.ar' },
     { name: 'Red de Turismo Rural Valles de Altura', initials: 'VA', url: 'https://turismoruralvallesdealtura.com.ar' },
@@ -317,38 +314,39 @@ class Component extends DCLogic {
 
   state = { lang: null, open: null };
 
-  // Random subset drawn ONCE per page load, then cached on the instance so it
-  // stays stable while the user navigates (language toggle, opening the carousel).
+  // Built ONCE per page load and cached on the instance. The showcase order is
+  // shuffled (varies per visit); the locality strips list every photo in order.
   selection() {
     if (this._sel) return this._sel;
-    const pick = (arr, n) => {
+    const shuffle = (arr) => {
       const a = arr.slice();
       for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
       }
-      return a.slice(0, n);
+      return a;
     };
     const loc = {};
     const feat = {};
     for (const r of this.regions) {
       const locs = this.files[r.key] || {};
       const folders = Object.keys(locs);
+      // Every locality lists ALL its photos (the strip scrolls horizontally).
       loc[r.key] = folders
         .map((folder) => ({
           folder,
           name: this.locNames[folder] || folder,
-          list: pick(locs[folder], this.perLocality)
+          list: locs[folder].slice()
         }))
         .filter((l) => l.list.length);
-      // Showcase: fotos al azar de TODA la región (cualquier localidad).
+      // Showcase: ALL photos of the region, shuffled so each visit differs.
       const pairs = [];
       folders.forEach((folder) =>
         locs[folder].forEach((file) =>
           pairs.push({ folder, name: this.locNames[folder] || folder, file })
         )
       );
-      feat[r.key] = pick(pairs, this.featuredCount);
+      feat[r.key] = shuffle(pairs);
     }
     this._sel = { loc, feat };
     return this._sel;
@@ -368,10 +366,11 @@ class Component extends DCLogic {
           const sp = api.scrollProgress();
           const snaps = api.scrollSnapList();
           const slides = api.slideNodes();
-          snaps.forEach((snap, i) => {
+          // Only the slides in view — keeps it smooth with hundreds of slides.
+          api.slidesInView().forEach((i) => {
             const layer = slides[i] && slides[i].querySelector('.embla__parallax__layer');
             if (!layer) return;
-            let tx = (snap - sp) * 50;
+            let tx = (snaps[i] - sp) * 50;
             tx = Math.max(-13, Math.min(13, tx));
             layer.style.transform = 'translateX(' + tx + '%)';
           });
@@ -411,7 +410,9 @@ class Component extends DCLogic {
     const el = document.getElementById('lb-track');
     if (el) el.scrollBy({ left: d * el.clientWidth, behavior: 'smooth' });
   }
-  openAt(i) { this._scrollTo = i; this.setState({ open: i }); }
+  // Open the full-screen viewer scoped to ONE set (a locality strip or a
+  // region showcase), positioned at index i within that set.
+  openSet(list, i) { this._viewer = list; this._scrollTo = i; this.setState({ open: i }); }
 
   renderVals() {
     const accent = this.props.accentColor || '#c9a063';
@@ -420,32 +421,25 @@ class Component extends DCLogic {
     const t = this.copy[L];
 
     const sel = this.selection();
-    let gi = 0;
-    const flat = [];
-    const mkPhoto = (regionKey, regionName, folder, locName, file) => {
-      const idx = gi++;
-      const rel = regionKey + '/' + folder + '/' + file;
-      const obj = {
-        gi: idx,
-        src: 'assets/images/' + encodeURI(rel),
-        alt: locName + ' — Natalia Favre',
-        region: regionName,
-        locality: locName,
-        title: locName,
-        metaLine: regionName + ' · ' + locName,
-        counter: '',
-        open: () => this.openAt(idx)
-      };
-      flat.push(obj);
-      return obj;
-    };
+    const mkPhoto = (regionKey, regionName, folder, locName, file) => ({
+      src: 'assets/images/' + encodeURI(regionKey + '/' + folder + '/' + file),
+      alt: locName + ' — Natalia Favre',
+      region: regionName,
+      locality: locName,
+      title: locName,
+      metaLine: regionName + ' · ' + locName,
+      counter: '',
+      open: null
+    });
+    // Each set (showcase per region, strip per locality) is its own viewer scope.
+    const bindOpen = (arr) => { arr.forEach((o, i) => { o.open = () => this.openSet(arr, i); }); return arr; };
     const sections = this.regions.map((r, ri) => {
-      // Showcase parallax (random de toda la región) — va primero en el flat.
-      const featured = (sel.feat[r.key] || []).map((p) => mkPhoto(r.key, r.name, p.folder, p.name, p.file));
+      // Showcase: ALL region photos (shuffled). Its own swipeable viewer scope.
+      const featured = bindOpen((sel.feat[r.key] || []).map((p) => mkPhoto(r.key, r.name, p.folder, p.name, p.file)));
       const locs = sel.loc[r.key] || [];
       let regionCount = 0;
       const localities = locs.map((loc) => {
-        const photos = loc.list.map((file) => mkPhoto(r.key, r.name, loc.folder, loc.name, file));
+        const photos = bindOpen(loc.list.map((file) => mkPhoto(r.key, r.name, loc.folder, loc.name, file)));
         regionCount += photos.length;
         return { name: loc.name, count: photos.length + ' ' + t.photosWord, photos };
       });
@@ -466,10 +460,10 @@ class Component extends DCLogic {
       };
     });
 
-    flat.forEach((o) => { o.counter = (o.gi + 1) + ' / ' + flat.length; });
-
     const open = this.state.open;
-    const current = open != null ? flat[open] : null;
+    const viewer = this._viewer || [];
+    const current = open != null && viewer[open] ? viewer[open] : null;
+    if (current) current.counter = (open + 1) + ' / ' + viewer.length;
 
     const fn = {
       setEs: () => this.setState({ lang: 'es' }),
@@ -482,7 +476,7 @@ class Component extends DCLogic {
         const el = e.target;
         if (!el || !el.clientWidth) return;
         const idx = Math.round(el.scrollLeft / el.clientWidth);
-        if (idx !== this.state.open && idx >= 0 && idx < flat.length) this.setState({ open: idx });
+        if (idx !== this.state.open && idx >= 0 && idx < viewer.length) this.setState({ open: idx });
       },
       imgError: (e) => { e.target.style.opacity = '0'; }
     };
@@ -493,7 +487,7 @@ class Component extends DCLogic {
       esColor: L === 'es' ? accent : '#9a948a',
       enColor: L === 'en' ? accent : '#9a948a',
       isOpen: open != null,
-      slides: flat,
+      slides: open != null ? viewer : [],
       current,
       fn
     };
