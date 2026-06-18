@@ -7,6 +7,8 @@
      support.js skips its unpkg fetch when window.React already exists. -->
 <script src="./vendor/react.production.min.js"></script>
 <script src="./vendor/react-dom.production.min.js"></script>
+<!-- Embla Carousel (vendored UMD) — powers the per-region parallax showcase -->
+<script src="./vendor/embla-carousel.umd.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -29,6 +31,21 @@
       .nav-links{width:100%; flex-wrap:wrap; justify-content:center; gap:10px 16px !important; font-size:12px !important; letter-spacing:0.1em !important;}
       .nav-autora{display:none !important;}
     }
+    /* Embla parallax showcase (uno por región) */
+    .embla{position:relative; margin-bottom:clamp(34px,5vw,56px);}
+    .embla__viewport{overflow:hidden; border-radius:3px; background:#141210;}
+    .embla__container{display:flex; touch-action:pan-y pinch-zoom;}
+    .embla__slide{position:relative; flex:0 0 88%; min-width:0; margin-right:14px; height:clamp(260px,52vh,520px); overflow:hidden; cursor:pointer;}
+    .embla__parallax{position:absolute; inset:0; overflow:hidden;}
+    .embla__parallax__layer{position:absolute; inset:0; display:flex; justify-content:center; will-change:transform;}
+    .embla__parallax__layer img{width:128%; height:100%; max-width:none; object-fit:cover; flex:0 0 128%; filter:brightness(0.96);}
+    .embla__cap{position:absolute; left:0; right:0; bottom:0; padding:18px 20px; background:linear-gradient(to top, rgba(11,10,9,0.92) 0%, rgba(11,10,9,0) 70%); pointer-events:none;}
+    .embla__cap .k{font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#c9a063; margin-bottom:4px;}
+    .embla__cap .n{font-family:'Cormorant Garamond',serif; font-size:clamp(20px,2.4vw,28px); line-height:1.1; color:#f3efe8;}
+    .embla__btn{position:absolute; top:50%; transform:translateY(-50%); z-index:2; width:42px; height:42px; border-radius:999px; border:1px solid rgba(232,228,221,0.25); background:rgba(11,10,9,0.5); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); color:#f3efe8; font-family:'Cormorant Garamond',serif; font-size:26px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+    .embla__btn:hover{border-color:#c9a063;}
+    .embla__btn--prev{left:12px;} .embla__btn--next{right:12px;}
+    @media (max-width:680px){ .embla__slide{flex:0 0 92%; height:clamp(300px,56vh,460px);} .embla__btn{display:none;} }
   </style>
 </helmet>
 <div style="background:#0b0a09; color:#e8e4dd; font-family:'Archivo',sans-serif; -webkit-font-smoothing:antialiased; min-height:100vh; width:100%; overflow-x:hidden;">
@@ -90,6 +107,27 @@
           </div>
           <span style="font-family:'Courier New',monospace; font-size:12px; color:#6f6a61; letter-spacing:0.08em; padding-bottom:6px;">{{ section.countLabel }}</span>
         </div>
+
+        <sc-if value="{{ section.hasFeatured }}" hint-placeholder-val="{{ false }}">
+          <div class="embla">
+            <div class="embla__viewport" id="{{ section.emblaId }}">
+              <div class="embla__container">
+                <sc-for list="{{ section.featured }}" as="shot" hint-placeholder-count="3">
+                  <div class="embla__slide" onClick="{{ shot.open }}">
+                    <div class="embla__parallax">
+                      <div class="embla__parallax__layer">
+                        <img src="{{ shot.src }}" alt="{{ shot.alt }}" decoding="async" onError="{{ fn.imgError }}" />
+                      </div>
+                    </div>
+                    <div class="embla__cap"><div class="k">{{ shot.region }}</div><div class="n">{{ shot.locality }}</div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <button type="button" class="embla__btn embla__btn--prev" aria-label="Anterior" onClick="{{ section.emblaPrev }}">‹</button>
+            <button type="button" class="embla__btn embla__btn--next" aria-label="Siguiente" onClick="{{ section.emblaNext }}">›</button>
+          </div>
+        </sc-if>
 
         <sc-if value="{{ section.empty }}" hint-placeholder-val="{{ false }}">
           <div style="border:1px dashed rgba(232,228,221,0.16); border-radius:4px; padding:clamp(36px,7vw,72px); text-align:center; color:#6f6a61; font-family:'Courier New',monospace; font-size:13px; letter-spacing:0.06em;">{{ section.emptyLabel }}</div>
@@ -222,7 +260,10 @@ class Component extends DCLogic {
   locNames = { HOrnocal: 'Hornocal', OCUMAZO: 'Ocumazo', Pucara: 'Pucará' };
 
   // Fotos mostradas por localidad en cada visita (selección aleatoria).
-  perLocality = 8;
+  perLocality = 4;
+
+  // Fotos en el carrusel parallax (showcase) de cada región.
+  featuredCount = 6;
 
   groups = [
     { name: 'Saberes de la Quebrada', initials: 'SQ', url: 'https://saberesdelaquebrada.com.ar' },
@@ -288,19 +329,58 @@ class Component extends DCLogic {
       }
       return a.slice(0, n);
     };
-    const out = {};
+    const loc = {};
+    const feat = {};
     for (const r of this.regions) {
       const locs = this.files[r.key] || {};
-      out[r.key] = Object.keys(locs)
+      const folders = Object.keys(locs);
+      loc[r.key] = folders
         .map((folder) => ({
           folder,
           name: this.locNames[folder] || folder,
           list: pick(locs[folder], this.perLocality)
         }))
         .filter((l) => l.list.length);
+      // Showcase: fotos al azar de TODA la región (cualquier localidad).
+      const pairs = [];
+      folders.forEach((folder) =>
+        locs[folder].forEach((file) =>
+          pairs.push({ folder, name: this.locNames[folder] || folder, file })
+        )
+      );
+      feat[r.key] = pick(pairs, this.featuredCount);
     }
-    this._sel = out;
-    return out;
+    this._sel = { loc, feat };
+    return this._sel;
+  }
+
+  // Initialize one Embla parallax carousel per region (vendored UMD global).
+  initEmbla() {
+    this._embla = {};
+    if (!window.EmblaCarousel) return;
+    for (const r of this.regions) {
+      const node = document.getElementById('embla-' + r.key);
+      if (!node) continue;
+      try {
+        const api = window.EmblaCarousel(node, { loop: false, align: 'start', containScroll: 'trimSnaps' });
+        this._embla[r.key] = api;
+        const parallax = () => {
+          const sp = api.scrollProgress();
+          const snaps = api.scrollSnapList();
+          const slides = api.slideNodes();
+          snaps.forEach((snap, i) => {
+            const layer = slides[i] && slides[i].querySelector('.embla__parallax__layer');
+            if (!layer) return;
+            let tx = (snap - sp) * 50;
+            tx = Math.max(-13, Math.min(13, tx));
+            layer.style.transform = 'translateX(' + tx + '%)';
+          });
+        };
+        api.on('scroll', parallax);
+        api.on('reInit', parallax);
+        parallax();
+      } catch (err) { /* degradación: queda como fila deslizable */ }
+    }
   }
 
   componentDidMount() {
@@ -311,8 +391,12 @@ class Component extends DCLogic {
       else if (e.key === 'ArrowRight') this.scrollSlide(1);
     };
     window.addEventListener('keydown', this._key);
+    this.initEmbla();
   }
-  componentWillUnmount() { window.removeEventListener('keydown', this._key); }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this._key);
+    if (this._embla) for (const k in this._embla) try { this._embla[k].destroy(); } catch (e) {}
+  }
 
   // After opening, jump the scroll-snap track to the tapped slide.
   componentDidUpdate() {
@@ -338,26 +422,30 @@ class Component extends DCLogic {
     const sel = this.selection();
     let gi = 0;
     const flat = [];
+    const mkPhoto = (regionKey, regionName, folder, locName, file) => {
+      const idx = gi++;
+      const rel = regionKey + '/' + folder + '/' + file;
+      const obj = {
+        gi: idx,
+        src: 'assets/images/' + encodeURI(rel),
+        alt: locName + ' — Natalia Favre',
+        region: regionName,
+        locality: locName,
+        title: locName,
+        metaLine: regionName + ' · ' + locName,
+        counter: '',
+        open: () => this.openAt(idx)
+      };
+      flat.push(obj);
+      return obj;
+    };
     const sections = this.regions.map((r, ri) => {
-      const locs = sel[r.key] || [];
+      // Showcase parallax (random de toda la región) — va primero en el flat.
+      const featured = (sel.feat[r.key] || []).map((p) => mkPhoto(r.key, r.name, p.folder, p.name, p.file));
+      const locs = sel.loc[r.key] || [];
       let regionCount = 0;
       const localities = locs.map((loc) => {
-        const photos = loc.list.map((file) => {
-          const idx = gi++;
-          const rel = r.key + '/' + loc.folder + '/' + file;
-          const obj = {
-            gi: idx,
-            src: 'assets/images/' + encodeURI(rel),
-            alt: loc.name + ' — Natalia Favre',
-            region: r.name,
-            title: loc.name,
-            metaLine: r.name + ' · ' + loc.name,
-            counter: '',
-            open: () => this.openAt(idx)
-          };
-          flat.push(obj);
-          return obj;
-        });
+        const photos = loc.list.map((file) => mkPhoto(r.key, r.name, loc.folder, loc.name, file));
         regionCount += photos.length;
         return { name: loc.name, count: photos.length + ' ' + t.photosWord, photos };
       });
@@ -369,6 +457,11 @@ class Component extends DCLogic {
         empty: localities.length === 0,
         emptyLabel: t.emptyState,
         countLabel: regionCount ? regionCount + ' ' + t.photosWord : '',
+        emblaId: 'embla-' + r.key,
+        featured,
+        hasFeatured: featured.length > 0,
+        emblaPrev: () => { if (this._embla && this._embla[r.key]) this._embla[r.key].scrollPrev(); },
+        emblaNext: () => { if (this._embla && this._embla[r.key]) this._embla[r.key].scrollNext(); },
         localities
       };
     });
