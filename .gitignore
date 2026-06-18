@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+.thumbnail
+
+# Agent tooling cache
+.atl/

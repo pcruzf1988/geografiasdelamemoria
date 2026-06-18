@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- React vendored locally so the exhibition does not depend on a CDN (museum wifi safe).
+     support.js skips its unpkg fetch when window.React already exists. -->
+<script src="./vendor/react.production.min.js"></script>
+<script src="./vendor/react-dom.production.min.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    html,body{margin:0;padding:0;background:#0b0a09;}
+    ::selection{background:#c9a063;color:#0b0a09;}
+    @keyframes lbIn{from{opacity:0}to{opacity:1}}
+    @keyframes lbImg{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
+  </style>
+</helmet>
+<div style="background:#0b0a09; color:#e8e4dd; font-family:'Archivo',sans-serif; -webkit-font-smoothing:antialiased; min-height:100vh; width:100%; overflow-x:hidden;">
+
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:14px clamp(20px,5vw,56px); background:rgba(11,10,9,0.72); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border-bottom:1px solid rgba(232,228,221,0.08);">
+    <a href="#top" style="text-decoration:none; color:#e8e4dd; font-family:'Cormorant Garamond',serif; font-size:18px; letter-spacing:0.01em; white-space:nowrap;">Geografías de la memoria</a>
+    <div style="display:flex; align-items:center; gap:clamp(14px,2.4vw,30px); font-size:12px; letter-spacing:0.12em; text-transform:uppercase;">
+      <a href="#muestra" style="text-decoration:none; color:#9a948a; display:none;" class="nv">{{ t.navMuestra }}</a>
+      <a href="#quebrada" style="text-decoration:none; color:#9a948a;">Quebrada</a>
+      <a href="#yungas" style="text-decoration:none; color:#9a948a;">Yungas</a>
+      <a href="#puna" style="text-decoration:none; color:#9a948a;">Puna</a>
+      <a href="#autora" style="text-decoration:none; color:#9a948a;">{{ t.navAutora }}</a>
+      <div style="display:flex; align-items:center; gap:7px; padding-left:clamp(8px,1.5vw,16px); border-left:1px solid rgba(232,228,221,0.12);">
+        <button type="button" onClick="{{ fn.setEs }}" style="background:none; border:none; cursor:pointer; padding:0; font-family:'Archivo',sans-serif; font-size:12px; letter-spacing:0.12em; color: {{ esColor }};">ES</button>
+        <span style="color:#4d4843;">/</span>
+        <button type="button" onClick="{{ fn.setEn }}" style="background:none; border:none; cursor:pointer; padding:0; font-family:'Archivo',sans-serif; font-size:12px; letter-spacing:0.12em; color: {{ enColor }};">EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <header id="top" style="position:relative; min-height:92vh; display:flex; flex-direction:column; justify-content:flex-end; padding:clamp(28px,6vw,72px); margin-top:-57px; overflow:hidden;">
+    <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#16130f 0,#16130f 13px,#110e0b 13px,#110e0b 26px);"></div>
+    <img src="assets/images/hero.jpg" alt="" onError="{{ fn.imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:brightness(0.55);" />
+    <div style="position:absolute; inset:0; background:linear-gradient(to top, #0b0a09 2%, rgba(11,10,9,0.35) 45%, rgba(11,10,9,0.55) 100%);"></div>
+    <div style="position:absolute; top:50%; left:clamp(28px,6vw,72px); transform:translateY(-50%); font-family:'Courier New',monospace; font-size:11px; color:#5f5a51; letter-spacing:0.05em; pointer-events:none;">assets/images/hero.jpg</div>
+    <div style="position:relative; max-width:1180px; width:100%;">
+      <div style="font-size:12px; letter-spacing:0.34em; text-transform:uppercase; color:#c9a063; margin-bottom:clamp(16px,3vw,26px);">{{ t.kicker }}</div>
+      <h1 style="font-family:'Cormorant Garamond',serif; font-weight:400; font-size:clamp(46px,9vw,128px); line-height:0.98; letter-spacing:-0.01em; margin:0 0 clamp(18px,3vw,30px); color:#f3efe8; max-width:14ch;">Geografías de la memoria</h1>
+      <p style="font-size:clamp(15px,1.5vw,18px); color:#cfc9bf; letter-spacing:0.02em; margin:0 0 10px; max-width:48ch;">{{ t.subtitle }}</p>
+      <p style="font-family:'Courier New',monospace; font-size:12px; color:#8a847a; letter-spacing:0.04em; margin:0;">{{ t.meta }}</p>
+    </div>
+    <div style="position:absolute; bottom:clamp(20px,4vw,40px); right:clamp(28px,6vw,72px); writing-mode:vertical-rl; font-size:11px; letter-spacing:0.28em; text-transform:uppercase; color:#6f6a61;">Jujuy · Argentina</div>
+  </header>
+
+  <section id="muestra" style="padding:clamp(64px,11vw,148px) clamp(20px,6vw,72px); scroll-margin-top:64px; border-top:1px solid rgba(232,228,221,0.07);">
+    <div style="max-width:1180px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1fr); gap:clamp(28px,5vw,80px);">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:clamp(28px,5vw,72px); align-items:start;">
+        <div>
+          <div style="font-size:12px; letter-spacing:0.28em; text-transform:uppercase; color:#c9a063; margin-bottom:16px;">{{ t.curKicker }}</div>
+          <div style="width:48px; height:1px; background:rgba(232,228,221,0.25);"></div>
+        </div>
+        <div style="max-width:62ch;">
+          <p style="font-family:'Cormorant Garamond',serif; font-weight:400; font-size:clamp(21px,2.3vw,30px); line-height:1.5; color:#e8e4dd; margin:0 0 1.1em; text-wrap:pretty;">{{ t.cur1 }}</p>
+          <p style="font-size:clamp(15px,1.4vw,17px); line-height:1.85; color:#b3ada3; margin:0; text-wrap:pretty;">{{ t.cur2 }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <sc-for list="{{ sections }}" as="section" hint-placeholder-count="3">
+    <section id="{{ section.id }}" style="padding:clamp(40px,7vw,96px) clamp(20px,6vw,72px) clamp(56px,9vw,120px); scroll-margin-top:60px; border-top:1px solid rgba(232,228,221,0.07);">
+      <div style="max-width:1320px; margin:0 auto;">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:18px 32px; margin-bottom:clamp(30px,4vw,52px);">
+          <div style="display:flex; align-items:baseline; gap:clamp(16px,2.5vw,30px);">
+            <span style="font-family:'Courier New',monospace; font-size:13px; color:#c9a063; letter-spacing:0.06em;">{{ section.num }}</span>
+            <div>
+              <h2 style="font-family:'Cormorant Garamond',serif; font-weight:400; font-size:clamp(38px,6vw,74px); line-height:1; letter-spacing:-0.01em; margin:0; color:#f3efe8;">{{ section.name }}</h2>
+              <p style="font-size:13px; letter-spacing:0.04em; color:#9a948a; margin:10px 0 0;">{{ section.sub }}</p>
+            </div>
+          </div>
+          <span style="font-family:'Courier New',monospace; font-size:12px; color:#6f6a61; letter-spacing:0.08em; padding-bottom:6px;">{{ section.countLabel }}</span>
+        </div>
+
+        <sc-if value="{{ section.empty }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px dashed rgba(232,228,221,0.16); border-radius:4px; padding:clamp(36px,7vw,72px); text-align:center; color:#6f6a61; font-family:'Courier New',monospace; font-size:13px; letter-spacing:0.06em;">{{ section.emptyLabel }}</div>
+        </sc-if>
+
+        <sc-for list="{{ section.localities }}" as="loc" hint-placeholder-count="3">
+          <div style="margin-bottom:clamp(34px,5vw,60px);">
+            <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid rgba(232,228,221,0.07);">
+              <h3 style="font-family:'Cormorant Garamond',serif; font-weight:400; font-size:clamp(22px,2.6vw,30px); line-height:1; margin:0; color:#e8e4dd;">{{ loc.name }}</h3>
+              <span style="font-family:'Courier New',monospace; font-size:11px; color:#6f6a61; letter-spacing:0.06em;">{{ loc.count }}</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(clamp(118px,21vw,176px),1fr)); gap:10px;">
+              <sc-for list="{{ loc.photos }}" as="photo" hint-placeholder-count="6">
+                <button type="button" onClick="{{ photo.open }}" aria-label="{{ photo.alt }}" style="position:relative; width:100%; aspect-ratio:1; margin:0; padding:0; border:none; cursor:pointer; display:block; overflow:hidden; background:#141210;">
+                  <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#1a1714 0,#1a1714 9px,#15120f 9px,#15120f 18px);"></div>
+                  <img src="{{ photo.src }}" alt="{{ photo.alt }}" loading="lazy" decoding="async" onError="{{ fn.imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:brightness(0.9); transition:transform 0.5s ease, filter 0.5s ease;" style-hover="transform:scale(1.05); filter:brightness(1.04);" />
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+
+  <section id="autora" style="padding:clamp(64px,10vw,140px) clamp(20px,6vw,72px); scroll-margin-top:60px; border-top:1px solid rgba(232,228,221,0.07); background:#0e0c0a;">
+    <div style="max-width:1000px; margin:0 auto; display:flex; gap:clamp(32px,5vw,72px); align-items:center; flex-wrap:wrap;">
+      <div style="position:relative; width:clamp(160px,22vw,220px); aspect-ratio:1; border-radius:999px; overflow:hidden; flex:none; background:#15120f;">
+        <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#1a1714 0,#1a1714 10px,#15120f 10px,#15120f 20px); display:flex; align-items:center; justify-content:center;">
+          <span style="font-family:'Courier New',monospace; font-size:10px; color:#6f6a61; text-align:center; line-height:1.6; padding:0 18px; word-break:break-word;">retrato<br>Natalia Favre</span>
+        </div>
+        <img src="assets/images/natalia-favre.jpg" alt="Natalia Favre" onError="{{ fn.imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:grayscale(0.15);" />
+      </div>
+      <div style="flex:1; min-width:300px;">
+        <div style="font-size:12px; letter-spacing:0.28em; text-transform:uppercase; color:#c9a063; margin-bottom:14px;">{{ t.authorKicker }}</div>
+        <h2 style="font-family:'Cormorant Garamond',serif; font-weight:400; font-size:clamp(36px,5vw,58px); line-height:1; margin:0 0 8px; color:#f3efe8;">Natalia Favre</h2>
+        <p style="font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:#9a948a; margin:0 0 22px;">{{ t.authorRole }}</p>
+        <p style="font-size:clamp(15px,1.4vw,17px); line-height:1.85; color:#b3ada3; margin:0; max-width:56ch; text-wrap:pretty;">{{ t.authorBio }}</p>
+      </div>
+    </div>
+  </section>
+
+  <footer id="creditos" style="padding:clamp(56px,9vw,120px) clamp(20px,6vw,72px) clamp(40px,6vw,64px); border-top:1px solid rgba(232,228,221,0.07); text-align:center;">
+    <div style="font-size:12px; letter-spacing:0.28em; text-transform:uppercase; color:#c9a063; margin-bottom:16px;">{{ t.creditsKicker }}</div>
+    <h3 style="font-family:'Cormorant Garamond',serif; font-weight:400; font-size:clamp(28px,4vw,46px); line-height:1.05; margin:0 auto 16px; color:#f3efe8; max-width:18ch;">{{ t.creditsTitle }}</h3>
+    <p style="font-size:15px; line-height:1.7; color:#9a948a; margin:0 auto 56px; max-width:56ch; text-wrap:pretty;">{{ t.creditsIntro }}</p>
+    <div style="display:flex; gap:clamp(24px,4vw,56px); justify-content:center; align-items:flex-start; flex-wrap:wrap; max-width:900px; margin:0 auto;">
+      <sc-for list="{{ groups }}" as="group" hint-placeholder-count="3">
+        <a href="{{ group.url }}" target="_blank" rel="noopener" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; align-items:center; gap:16px; width:210px; group:hover;">
+          <div style="position:relative; width:88px; height:88px; border:1px solid rgba(232,228,221,0.22); border-radius:999px; display:flex; align-items:center; justify-content:center; transition:border-color 0.3s, background 0.3s;" style-hover="border-color:#c9a063; background:rgba(201,160,99,0.06);">
+            <span style="font-family:'Cormorant Garamond',serif; font-size:30px; color:#e8e4dd; letter-spacing:0.02em;">{{ group.initials }}</span>
+            <span style="position:absolute; bottom:-7px; right:-7px; background:#0b0a09; font-family:'Courier New',monospace; font-size:8px; color:#5f5a51; padding:2px 4px;">logo</span>
+          </div>
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif; font-size:19px; line-height:1.2; color:#e8e4dd; margin-bottom:8px; text-wrap:balance;">{{ group.name }}</div>
+            <div style="font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#c9a063;">{{ t.visitWord }} ↗</div>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+    <div style="margin-top:clamp(56px,8vw,96px); padding-top:28px; border-top:1px solid rgba(232,228,221,0.07); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <span style="font-family:'Cormorant Garamond',serif; font-size:16px; color:#9a948a;">Geografías de la memoria</span>
+      <span style="font-family:'Courier New',monospace; font-size:11px; color:#5f5a51; letter-spacing:0.04em;">{{ t.footerNote }}</span>
+    </div>
+  </footer>
+
+  <sc-if value="{{ isOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ fn.close }}" style="position:fixed; inset:0; z-index:100; background:rgba(7,6,5,0.97); display:flex; flex-direction:column; animation:lbIn 0.25s ease;">
+      <div style="position:absolute; top:22px; left:clamp(20px,4vw,40px); z-index:3; font-family:'Courier New',monospace; font-size:12px; letter-spacing:0.08em; color:#8a847a; pointer-events:none;">{{ current.counter }}</div>
+      <button type="button" onClick="{{ fn.close }}" style="position:absolute; top:14px; right:clamp(16px,3vw,32px); z-index:3; background:none; border:none; cursor:pointer; color:#cfc9bf; font-size:30px; line-height:1; padding:8px;" style-hover="color:#fff;">✕</button>
+      <button type="button" onClick="{{ fn.prev }}" style="position:absolute; left:clamp(8px,2vw,28px); top:50%; transform:translateY(-50%); z-index:3; background:none; border:none; cursor:pointer; color:#8a847a; font-family:'Cormorant Garamond',serif; font-size:56px; line-height:1; padding:12px;" style-hover="color:#fff;">‹</button>
+      <button type="button" onClick="{{ fn.next }}" style="position:absolute; right:clamp(8px,2vw,28px); top:50%; transform:translateY(-50%); z-index:3; background:none; border:none; cursor:pointer; color:#8a847a; font-family:'Cormorant Garamond',serif; font-size:56px; line-height:1; padding:12px;" style-hover="color:#fff;">›</button>
+
+      <div id="lb-track" onClick="{{ fn.stop }}" onScroll="{{ fn.onScroll }}" style="flex:1; min-height:0; display:flex; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
+        <sc-for list="{{ slides }}" as="slide" hint-placeholder-count="3">
+          <div style="flex:0 0 100%; width:100%; height:100%; scroll-snap-align:center; scroll-snap-stop:always; display:flex; align-items:center; justify-content:center; padding:clamp(16px,4vw,56px) clamp(40px,7vw,90px);">
+            <img src="{{ slide.src }}" alt="{{ slide.alt }}" loading="lazy" decoding="async" onError="{{ fn.imgError }}" style="max-width:100%; max-height:100%; object-fit:contain; animation:lbImg 0.3s ease;" />
+          </div>
+        </sc-for>
+      </div>
+
+      <div onClick="{{ fn.stop }}" style="flex:none; text-align:center; padding:clamp(14px,2.5vw,24px) clamp(20px,4vw,40px) clamp(20px,3.5vw,34px); background:linear-gradient(to top, rgba(7,6,5,0.85), rgba(7,6,5,0));">
+        <div style="font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:#c9a063; margin-bottom:8px;">{{ current.region }}</div>
+        <div style="font-family:'Cormorant Garamond',serif; font-size:clamp(20px,2.6vw,30px); line-height:1.2; color:#f3efe8;">{{ current.title }}</div>
+        <div style="font-family:'Courier New',monospace; font-size:11px; letter-spacing:0.04em; color:#8a847a; margin-top:8px;">{{ current.metaLine }}</div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:900},&quot;accentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#c9a063&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;minColumnWidth&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:320,&quot;min&quot;:240,&quot;max&quot;:440,&quot;step&quot;:20,&quot;tsType&quot;:&quot;number&quot;},&quot;defaultLang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;es&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  /* ============================================================
+     INVENTARIO COMPLETO DE FOTOS  ·  FULL PHOTO INVENTORY
+     ------------------------------------------------------------
+     Generado desde assets/images/<region>/<localidad>/.
+     En cada visita se muestra una selección ALEATORIA de
+     `perLocality` fotos por localidad (cambia al recargar).
+     Para agregar/quitar fotos, editá las listas de abajo.
+     La ruta final que usa el sitio es:
+         assets/images/<region>/<localidad>/<archivo>
+     ============================================================ */
+  files = {
+    quebrada: {
+      "Cianzo": ["Cianzo 1 de tamaño grande.jpeg", "Cianzo 2 de tamaño grande.jpeg", "Cianzo 3 de tamaño grande.jpeg", "Cianzo 4 de tamaño grande.jpeg", "Cianzo 5 de tamaño grande.jpeg", "Cianzo 6 de tamaño grande.jpeg", "Cianzo 7 de tamaño grande.jpeg", "Cianzo 8 de tamaño grande.jpeg", "Cianzo 9 de tamaño grande.jpeg", "Cianzo 10 de tamaño grande.jpeg", "Cianzo 11 de tamaño grande.jpeg", "Cianzo 12 de tamaño grande.jpeg", "Cianzo 13 de tamaño grande.jpeg", "Cianzo 14 de tamaño grande.jpeg", "Cianzo 15 de tamaño grande.jpeg", "Cianzo 16 de tamaño grande.jpeg", "Cianzo 17 de tamaño grande.jpeg", "Cianzo 18 de tamaño grande.jpeg", "Cianzo 19 de tamaño grande.jpeg", "Cianzo 20 de tamaño grande.jpeg", "Cianzo 21 de tamaño grande.jpeg", "Cianzo 22 de tamaño grande.jpeg", "Cianzo 23 de tamaño grande.jpeg", "Cianzo 24 de tamaño grande.jpeg", "Cianzo 25 de tamaño grande.jpeg", "Cianzo 26 de tamaño grande.jpeg", "Cianzo 27 de tamaño grande.jpeg", "Cianzo 28 de tamaño grande.jpeg", "Cianzo 29 de tamaño grande.jpeg", "Cianzo 30 de tamaño grande.jpeg", "Cianzo 31 de tamaño grande.jpeg", "Cianzo 32 de tamaño grande.jpeg", "Cianzo 33 de tamaño grande.jpeg", "Cianzo 55 de tamaño grande.jpeg", "Cianzo 56 de tamaño grande.jpeg", "Cianzo de tamaño grande.jpeg"],
+      "Coctaca": ["Coctaca 1 de tamaño grande.jpeg", "Coctaca 2 de tamaño grande.jpeg", "Coctaca 3 de tamaño grande.jpeg", "Coctaca 4 de tamaño grande.jpeg", "Coctaca 5 de tamaño grande.jpeg", "Coctaca 6 de tamaño grande.jpeg", "Coctaca 7 de tamaño grande.jpeg", "Coctaca 8 de tamaño grande.jpeg", "Coctaca 9 de tamaño grande.jpeg", "Coctaca 10 de tamaño grande.jpeg", "Coctaca 11 de tamaño grande.jpeg", "Coctaca 12 de tamaño grande.jpeg", "Coctaca 13 de tamaño grande.jpeg", "Coctaca 14 de tamaño grande.jpeg", "Coctaca 15 de tamaño grande.jpeg", "Coctaca 16 de tamaño grande.jpeg", "Coctaca 17 de tamaño grande.jpeg", "Coctaca 18 de tamaño grande.jpeg", "Coctaca 19 de tamaño grande.jpeg", "Coctaca 20 de tamaño grande.jpeg", "Coctaca 21 de tamaño grande.jpeg", "Coctaca 22 de tamaño grande.jpeg", "Coctaca 23 de tamaño grande.jpeg", "Coctaca 24 de tamaño grande.jpeg", "Coctaca 25 de tamaño grande.jpeg", "Coctaca de tamaño grande.jpeg"],
+      "HOrnocal": ["hornocal 1 de tamaño grande.jpeg", "hornocal 2 de tamaño grande.jpeg", "hornocal 3 de tamaño grande.jpeg", "hornocal 4 de tamaño grande.jpeg", "hornocal 5 de tamaño grande.jpeg", "hornocal 6 de tamaño grande.jpeg", "hornocal 7 de tamaño grande.jpeg", "hornocal 8 de tamaño grande.jpeg", "hornocal 9 de tamaño grande.jpeg", "hornocal 10 de tamaño grande.jpeg", "hornocal 11 de tamaño grande.jpeg", "hornocal 12 de tamaño grande.jpeg", "hornocal 13 de tamaño grande.jpeg", "hornocal 14 de tamaño grande.jpeg", "hornocal 19 de tamaño grande.jpeg", "hornocal 20 de tamaño grande.jpeg", "hornocal 21 de tamaño grande.jpeg", "hornocal 22 de tamaño grande.jpeg", "hornocal 23 de tamaño grande.jpeg", "hornocal 24 de tamaño grande.jpeg", "hornocal 25 de tamaño grande.jpeg", "hornocal 26 de tamaño grande.jpeg", "hornocal 27 de tamaño grande.jpeg", "hornocal 28 de tamaño grande.jpeg", "hornocal 29 de tamaño grande.jpeg", "hornocal 30 de tamaño grande.jpeg", "hornocal 31 de tamaño grande.jpeg", "hornocal 32 de tamaño grande.jpeg", "hornocal 33 de tamaño grande.jpeg", "hornocal 34 de tamaño grande.jpeg", "hornocal 35 de tamaño grande.jpeg", "hornocal 36 de tamaño grande.jpeg", "hornocal 37 de tamaño grande.jpeg", "hornocal 38 de tamaño grande.jpeg", "hornocal 39 de tamaño grande.jpeg", "hornocal 40 de tamaño grande.jpeg", "hornocal 41 de tamaño grande.jpeg", "hornocal 42 de tamaño grande.jpeg", "hornocal 43 de tamaño grande.jpeg", "hornocal de tamaño grande.jpeg"],
+      "OCUMAZO": ["ocumazo 1 de tamaño grande 2.jpeg", "Ocumazo 1 de tamaño grande.jpeg", "ocumazo 2 de tamaño grande 2.jpeg", "Ocumazo 2 de tamaño grande.jpeg", "ocumazo 3 de tamaño grande 2.jpeg", "Ocumazo 3 de tamaño grande.jpeg", "ocumazo 4 de tamaño grande 2.jpeg", "Ocumazo 4 de tamaño grande.jpeg", "ocumazo 5 de tamaño grande 2.jpeg", "Ocumazo 5 de tamaño grande.jpeg", "ocumazo 6 de tamaño grande 2.jpeg", "Ocumazo 6 de tamaño grande.jpeg", "ocumazo 7 de tamaño grande 2.jpeg", "Ocumazo 7 de tamaño grande.jpeg", "ocumazo 8 de tamaño grande 2.jpeg", "Ocumazo 8 de tamaño grande.jpeg", "ocumazo 9 de tamaño grande 2.jpeg", "Ocumazo 9 de tamaño grande.jpeg", "ocumazo 10 de tamaño grande 2.jpeg", "Ocumazo 10 de tamaño grande.jpeg", "ocumazo 11 de tamaño grande 2.jpeg", "Ocumazo 11 de tamaño grande.jpeg", "ocumazo 12 de tamaño grande 2.jpeg", "Ocumazo 12 de tamaño grande.jpeg", "ocumazo 14 de tamaño grande.jpeg", "ocumazo 15 de tamaño grande 2.jpeg", "Ocumazo 15 de tamaño grande.jpeg", "ocumazo 16 de tamaño grande 2.jpeg", "Ocumazo 16 de tamaño grande.jpeg", "ocumazo 17 de tamaño grande.jpeg", "ocumazo 18 de tamaño grande.jpeg", "ocumazo 19 de tamaño grande.jpeg", "ocumazo 20 de tamaño grande 2.jpeg", "Ocumazo 20 de tamaño grande.jpeg", "ocumazo 21 de tamaño grande 2.jpeg", "Ocumazo 21 de tamaño grande.jpeg", "ocumazo 22 de tamaño grande.jpeg", "ocumazo 23 de tamaño grande.jpeg", "ocumazo 24 de tamaño grande 2.jpeg", "Ocumazo 24 de tamaño grande.jpeg", "ocumazo 25 de tamaño grande 2.jpeg", "Ocumazo 25 de tamaño grande.jpeg", "ocumazo 26 de tamaño grande 2.jpeg", "Ocumazo 26 de tamaño grande.jpeg", "ocumazo 27 de tamaño grande 2.jpeg", "Ocumazo 27 de tamaño grande.jpeg", "ocumazo 28 de tamaño grande 2.jpeg", "Ocumazo 28 de tamaño grande.jpeg", "ocumazo 29 de tamaño grande 2.jpeg", "Ocumazo 29 de tamaño grande.jpeg", "ocumazo 30 de tamaño grande 2.jpeg", "Ocumazo 30 de tamaño grande.jpeg", "ocumazo 31 de tamaño grande 2.jpeg", "Ocumazo 31 de tamaño grande.jpeg", "ocumazo 32 de tamaño grande.jpeg", "ocumazo 33 de tamaño grande 2.jpeg", "Ocumazo 33 de tamaño grande.jpeg", "ocumazo 34 de tamaño grande 2.jpeg", "Ocumazo 34 de tamaño grande.jpeg", "ocumazo 35 de tamaño grande 2.jpeg", "Ocumazo 35 de tamaño grande.jpeg", "ocumazo 36 de tamaño grande 2.jpeg", "Ocumazo 36 de tamaño grande.jpeg", "ocumazo 37 de tamaño grande 2.jpeg", "Ocumazo 37 de tamaño grande.jpeg", "ocumazo 38 de tamaño grande.jpeg", "ocumazo 39 de tamaño grande.jpeg", "ocumazo 40 de tamaño grande.jpeg", "ocumazo 41 de tamaño grande.jpeg", "ocumazo 42 de tamaño grande.jpeg", "ocumazo 43 de tamaño grande.jpeg", "ocumazo 44 de tamaño grande.jpeg", "ocumazo 45 de tamaño grande.jpeg", "ocumazo 46 de tamaño grande.jpeg", "ocumazo 47 de tamaño grande.jpeg", "Ocumazo 63 de tamaño grande.jpeg", "Ocumazo 64 de tamaño grande.jpeg", "Ocumazo 65 de tamaño grande.jpeg", "Ocumazo 66 de tamaño grande.jpeg", "Ocumazo 67 de tamaño grande.jpeg", "Ocumazo 68 de tamaño grande.jpeg", "Ocumazo 69 de tamaño grande.jpeg", "Ocumazo 70 de tamaño grande.jpeg", "Ocumazo 71 de tamaño grande.jpeg", "Ocumazo 72 de tamaño grande.jpeg", "Ocumazo 73 de tamaño grande.jpeg", "Ocumazo 74 de tamaño grande.jpeg", "Ocumazo 75 de tamaño grande.jpeg", "Ocumazo 76 de tamaño grande.jpeg", "Ocumazo 77 de tamaño grande.jpeg", "Ocumazo 78 de tamaño grande.jpeg", "Ocumazo 79 de tamaño grande.jpeg", "Ocumazo 80 de tamaño grande.jpeg", "Ocumazo 81 de tamaño grande.jpeg", "Ocumazo 82 de tamaño grande.jpeg", "Ocumazo 83 de tamaño grande.jpeg", "Ocumazo 84 de tamaño grande.jpeg", "Ocumazo 85 de tamaño grande.jpeg", "Ocumazo 86 de tamaño grande.jpeg", "Ocumazo 87 de tamaño grande.jpeg", "Ocumazo 88 de tamaño grande.jpeg", "Ocumazo 89 de tamaño grande.jpeg", "Ocumazo 90 de tamaño grande.jpeg", "Ocumazo 91 de tamaño grande.jpeg", "Ocumazo 92 de tamaño grande.jpeg", "Ocumazo 93 de tamaño grande.jpeg", "Ocumazo 94 de tamaño grande.jpeg", "Ocumazo 95 de tamaño grande.jpeg", "Ocumazo 96 de tamaño grande.jpeg", "Ocumazo 97 de tamaño grande.jpeg", "Ocumazo 98 de tamaño grande.jpeg", "Ocumazo 99 de tamaño grande.jpeg", "Ocumazo 100 de tamaño grande.jpeg", "Ocumazo 101 de tamaño grande.jpeg", "Ocumazo 102 de tamaño grande.jpeg", "Ocumazo 103 de tamaño grande.jpeg", "Ocumazo 104 de tamaño grande.jpeg", "Ocumazo 105 de tamaño grande.jpeg", "Ocumazo 106 de tamaño grande.jpeg", "Ocumazo 107 de tamaño grande.jpeg", "Ocumazo 108 de tamaño grande.jpeg", "Ocumazo 109 de tamaño grande.jpeg", "Ocumazo 110 de tamaño grande.jpeg", "Ocumazo 111 de tamaño grande.jpeg", "Ocumazo 112 de tamaño grande.jpeg", "Ocumazo 113 de tamaño grande.jpeg", "ocumazo de tamaño grande 2.jpeg", "Ocumazo de tamaño grande.jpeg"],
+      "Pucara": ["Pucara 1 de tamaño grande.jpeg", "Pucara 2 de tamaño grande.jpeg", "Pucara 3 de tamaño grande.jpeg", "Pucara 4 de tamaño grande.jpeg", "Pucara 5 de tamaño grande.jpeg", "Pucara 6 de tamaño grande.jpeg", "Pucara 7 de tamaño grande.jpeg", "Pucara 8 de tamaño grande.jpeg", "Pucara 9 de tamaño grande.jpeg", "Pucara 10 de tamaño grande.jpeg", "Pucara 11 de tamaño grande.jpeg", "Pucara 12 de tamaño grande.jpeg", "Pucara 23 de tamaño grande.jpeg", "Pucara 24 de tamaño grande.jpeg", "Pucara 25 de tamaño grande.jpeg", "Pucara 26 de tamaño grande.jpeg", "Pucara 28 de tamaño grande.jpeg", "Pucara 29 de tamaño grande.jpeg", "Pucara de tamaño grande.jpeg"],
+      "Rodero": ["Rodero 1 de tamaño grande.jpeg", "Rodero 2 de tamaño grande.jpeg", "Rodero 3 de tamaño grande.jpeg", "Rodero 4 de tamaño grande.jpeg", "Rodero 5 de tamaño grande.jpeg", "Rodero 6 de tamaño grande.jpeg", "Rodero 7 de tamaño grande.jpeg", "Rodero 8 de tamaño grande.jpeg", "Rodero 9 de tamaño grande.jpeg", "Rodero 10 de tamaño grande.jpeg", "Rodero 11 de tamaño grande.jpeg", "Rodero 13 de tamaño grande.jpeg", "Rodero 14 de tamaño grande.jpeg", "Rodero 21 de tamaño grande.jpeg", "Rodero 22 de tamaño grande.jpeg", "Rodero 23 de tamaño grande.jpeg", "Rodero 25 de tamaño grande.jpeg", "Rodero 26 de tamaño grande.jpeg", "Rodero 27 de tamaño grande.jpeg", "Rodero 28 de tamaño grande.jpeg", "Rodero 29 de tamaño grande.jpeg", "Rodero 30 de tamaño grande.jpeg", "Rodero 31 de tamaño grande.jpeg", "Rodero 32 de tamaño grande.jpeg", "Rodero 33 de tamaño grande.jpeg", "Rodero 34 de tamaño grande.jpeg", "Rodero 35 de tamaño grande.jpeg", "Rodero 37 de tamaño grande.jpeg", "Rodero 38 de tamaño grande.jpeg", "Rodero 43 de tamaño grande.jpeg", "Rodero 44 de tamaño grande.jpeg", "Rodero 45 de tamaño grande.jpeg", "Rodero 46 de tamaño grande.jpeg", "Rodero 47 de tamaño grande.jpeg", "Rodero 48 de tamaño grande.jpeg", "Rodero 49 de tamaño grande.jpeg", "Rodero 50 de tamaño grande.jpeg", "Rodero 51 de tamaño grande.jpeg", "Rodero 52 de tamaño grande.jpeg", "Rodero 53 de tamaño grande.jpeg", "Rodero 54 de tamaño grande.jpeg", "Rodero 55 de tamaño grande.jpeg", "Rodero 56 de tamaño grande.jpeg", "Rodero 58 de tamaño grande.jpeg", "Rodero 59 de tamaño grande.jpeg", "Rodero 60 de tamaño grande.jpeg", "Rodero 61 de tamaño grande.jpeg", "Rodero 62 de tamaño grande.jpeg", "Rodero 64 de tamaño grande.jpeg", "Rodero 66 de tamaño grande.jpeg", "Rodero 70 de tamaño grande.jpeg", "Rodero 71 de tamaño grande.jpeg", "Rodero 72 de tamaño grande.jpeg", "Rodero 73 de tamaño grande.jpeg", "Rodero 74 de tamaño grande.jpeg", "Rodero 75 de tamaño grande.jpeg", "Rodero 76 de tamaño grande.jpeg", "Rodero 78 de tamaño grande.jpeg", "Rodero 82 de tamaño grande.jpeg", "Rodero 84 de tamaño grande.jpeg", "Rodero 86 de tamaño grande.jpeg", "Rodero 87 de tamaño grande.jpeg", "Rodero 88 de tamaño grande.jpeg", "Rodero 89 de tamaño grande.jpeg", "Rodero 90 de tamaño grande.jpeg", "Rodero 93 de tamaño grande.jpeg", "Rodero 94 de tamaño grande.jpeg", "Rodero 95 de tamaño grande.jpeg", "Rodero 96 de tamaño grande.jpeg", "Rodero 103 de tamaño grande.jpeg", "Rodero 105 de tamaño grande.jpeg", "Rodero 106 de tamaño grande.jpeg", "Rodero 107 de tamaño grande.jpeg", "Rodero 108 de tamaño grande.jpeg", "Rodero 109 de tamaño grande.jpeg", "Rodero 110 de tamaño grande.jpeg", "Rodero de tamaño grande.jpeg"]
+    },
+    yungas: {
+      "Pampichuela": ["Pampichuela 0 de tamaño grande.jpeg", "Pampichuela 1 de tamaño grande.jpeg", "Pampichuela 2 de tamaño grande.jpeg", "Pampichuela 3 de tamaño grande.jpeg", "Pampichuela 4 de tamaño grande.jpeg", "Pampichuela 7 de tamaño grande.jpeg", "Pampichuela 8 de tamaño grande.jpeg", "Pampichuela 9 de tamaño grande.jpeg", "Pampichuela 10 de tamaño grande.jpeg", "Pampichuela 11 de tamaño grande.jpeg", "Pampichuela 12 de tamaño grande.jpeg", "Pampichuela 13 de tamaño grande.jpeg", "Pampichuela 14 de tamaño grande.jpeg", "Pampichuela 15 de tamaño grande.jpeg", "Pampichuela 16 de tamaño grande.jpeg", "Pampichuela 17 de tamaño grande.jpeg", "Pampichuela 18 de tamaño grande.jpeg", "Pampichuela 19 de tamaño grande.jpeg", "Pampichuela 20 de tamaño grande.jpeg", "Pampichuela 21 de tamaño grande.jpeg", "Pampichuela 22 de tamaño grande.jpeg", "Pampichuela 23 de tamaño grande.jpeg", "Pampichuela 24 de tamaño grande.jpeg", "Pampichuela 25 de tamaño grande.jpeg", "Pampichuela 26 de tamaño grande.jpeg", "Pampichuela 27 de tamaño grande.jpeg", "Pampichuela 28 de tamaño grande.jpeg", "Pampichuela 29 de tamaño grande.jpeg"],
+      "San Francisco": ["San Francisco 0.jpg", "San Francisco 1.jpg", "San Francisco 2.jpg", "San Francisco 3.jpg", "San Francisco 4.jpg", "San Francisco 5.jpg", "San Francisco 6.jpg", "San Francisco 7.jpg", "San Francisco 11.jpg", "San Francisco 12.jpg", "San Francisco 13.jpg", "San Francisco 14.jpg", "San Francisco 15.jpg", "San Francisco 16.jpg", "San Francisco 17.jpg", "San Francisco 18.jpg", "San Francisco 19.jpg", "San Francisco 20.jpg", "San Francisco 21.jpg", "San Francisco 22.jpg", "San Francisco 23.jpg", "San Francisco 24.jpg", "San Francisco 25.jpg", "San Francisco 26.jpg", "San Francisco 27.jpg", "San Francisco 28.jpg", "San Francisco 29.jpg", "San Francisco 31.jpg", "San Francisco 32.jpg", "San Francisco 33.jpg", "San Francisco 34.jpg", "San Francisco 35.jpg"],
+      "Santa Ana": ["Santa Ana 1 de tamaño grande.jpeg", "Santa Ana 2 de tamaño grande.jpeg", "Santa Ana 3 de tamaño grande.jpeg", "Santa Ana 4 de tamaño grande.jpeg", "Santa Ana 5 de tamaño grande.jpeg", "Santa Ana 6 de tamaño grande.jpeg", "Santa Ana 7 de tamaño grande.jpeg", "Santa Ana 8 de tamaño grande.jpeg", "Santa Ana 9 de tamaño grande.jpeg", "Santa Ana 10 de tamaño grande.jpeg", "Santa Ana 11 de tamaño grande.jpeg", "Santa Ana 12 de tamaño grande.jpeg", "Santa Ana 13 de tamaño grande.jpeg", "Santa Ana 14 de tamaño grande.jpeg", "Santa Ana 15 de tamaño grande.jpeg", "Santa Ana 16 de tamaño grande.jpeg", "Santa Ana 17 de tamaño grande.jpeg", "Santa Ana 18 de tamaño grande.jpeg", "Santa Ana 19 de tamaño grande.jpeg", "Santa Ana 20 de tamaño grande.jpeg", "Santa Ana 21 de tamaño grande.jpeg", "Santa Ana 22 de tamaño grande.jpeg", "Santa Ana 23 de tamaño grande.jpeg", "Santa Ana 24 de tamaño grande.jpeg", "Santa Ana 25 de tamaño grande.jpeg", "Santa Ana 26 de tamaño grande.jpeg", "Santa Ana 27 de tamaño grande.jpeg", "Santa Ana 28 de tamaño grande.jpeg", "Santa Ana 29 de tamaño grande.jpeg", "Santa Ana 30 de tamaño grande.jpeg", "Santa Ana 31 de tamaño grande.jpeg", "Santa Ana 32 de tamaño grande.jpeg", "Santa Ana 33 de tamaño grande.jpeg", "Santa Ana 34 de tamaño grande.jpeg", "Santa Ana 35 de tamaño grande.jpeg", "Santa Ana 36 de tamaño grande.jpeg", "Santa Ana 37 de tamaño grande.jpeg", "Santa Ana 38 de tamaño grande.jpeg", "Santa Ana 39 de tamaño grande.jpeg", "Santa Ana 40 de tamaño grande.jpeg", "Santa Ana 41 de tamaño grande.jpeg", "Santa Ana 42 de tamaño grande.jpeg", "Santa Ana 43 de tamaño grande.jpeg", "Santa Ana 44 de tamaño grande.jpeg", "Santa Ana 45 de tamaño grande.jpeg", "Santa Ana 46 de tamaño grande.jpeg", "Santa Ana 47 de tamaño grande.jpeg", "Santa Ana 48 de tamaño grande.jpeg", "Santa Ana 49 de tamaño grande.jpeg", "Santa Ana 50 de tamaño grande.jpeg", "Santa Ana 51 de tamaño grande.jpeg", "Santa Ana 52 de tamaño grande.jpeg", "Santa Ana 53 de tamaño grande.jpeg", "Santa Ana 54 de tamaño grande.jpeg", "Santa Ana 55 de tamaño grande.jpeg", "Santa Ana 56 de tamaño grande.jpeg", "Santa Ana 57 de tamaño grande.jpeg", "Santa Ana 58 de tamaño grande.jpeg", "Santa Ana 59 de tamaño grande.jpeg", "Santa Ana 60 de tamaño grande.jpeg", "Santa Ana 61 de tamaño grande.jpeg", "Santa Ana 62 de tamaño grande.jpeg", "Santa Ana 63 de tamaño grande.jpeg", "Santa Ana 64 de tamaño grande.jpeg", "Santa Ana 65 de tamaño grande.jpeg", "Santa Ana 66 de tamaño grande.jpeg", "Santa Ana 67 de tamaño grande.jpeg", "Santa Ana 68 de tamaño grande.jpeg", "Santa Ana 69 de tamaño grande.jpeg", "Santa Ana 70 de tamaño grande.jpeg", "Santa Ana 71 de tamaño grande.jpeg", "Santa Ana 72 de tamaño grande.jpeg", "Santa Ana 73 de tamaño grande.jpeg", "Santa Ana 74 de tamaño grande.jpeg", "Santa Ana 75 de tamaño grande.jpeg", "Santa Ana 76 de tamaño grande.jpeg", "Santa Ana 77 de tamaño grande.jpeg", "Santa Ana 78 de tamaño grande.jpeg", "Santa Ana 79 de tamaño grande.jpeg", "Santa Ana 80 de tamaño grande.jpeg", "Santa Ana 81 de tamaño grande.jpeg", "Santa Ana 82 de tamaño grande.jpeg", "Santa Ana 83 de tamaño grande.jpeg", "Santa Ana 84 de tamaño grande.jpeg", "Santa Ana 85 de tamaño grande.jpeg", "Santa Ana 86 de tamaño grande.jpeg", "Santa Ana 87 de tamaño grande.jpeg", "Santa Ana 88 de tamaño grande.jpeg", "Santa Ana 89 de tamaño grande.jpeg", "Santa Ana 90 de tamaño grande.jpeg", "Santa Ana 91 de tamaño grande.jpeg", "Santa Ana 92 de tamaño grande.jpeg", "Santa Ana 93 de tamaño grande.jpeg", "Santa Ana 94 de tamaño grande.jpeg", "Santa Ana 95 de tamaño grande.jpeg", "Santa Ana 96 de tamaño grande.jpeg", "Santa Ana 97 de tamaño grande.jpeg", "Santa Ana 98 de tamaño grande.jpeg", "Santa Ana 99 de tamaño grande.jpeg", "Santa Ana 100 de tamaño grande.jpeg", "Santa Ana 101 de tamaño grande.jpeg", "Santa Ana 105 de tamaño grande.jpeg", "Santa Ana 106 de tamaño grande.jpeg", "Santa Ana 107 de tamaño grande.jpeg", "Santa Ana 108 de tamaño grande.jpeg", "Santa Ana 109 de tamaño grande.jpeg", "Santa Ana 110 de tamaño grande.jpeg", "Santa Ana 111 de tamaño grande.jpeg", "Santa Ana 112 de tamaño grande.jpeg", "Santa Ana 113 de tamaño grande.jpeg", "Santa Ana 114 de tamaño grande.jpeg", "Santa Ana 116 de tamaño grande.jpeg", "Santa Ana 117 de tamaño grande.jpeg", "Santa Ana 118 de tamaño grande.jpeg", "Santa Ana 119 de tamaño grande.jpeg", "Santa Ana 120 de tamaño grande.jpeg", "Santa Ana 121 de tamaño grande.jpeg", "Santa Ana 122 de tamaño grande.jpeg", "Santa Ana 123 de tamaño grande.jpeg", "Santa Ana 124 de tamaño grande.jpeg", "Santa Ana 125 de tamaño grande.jpeg", "Santa Ana 126 de tamaño grande.jpeg", "Santa Ana 128 de tamaño grande.jpeg", "Santa Ana 129 de tamaño grande.jpeg", "Santa Ana 130 de tamaño grande.jpeg", "Santa Ana 131 de tamaño grande.jpeg", "Santa Ana 132 de tamaño grande.jpeg", "Santa Ana 133 de tamaño grande.jpeg", "Santa Ana 134 de tamaño grande.jpeg", "Santa Ana 135 de tamaño grande.jpeg", "Santa Ana 136 de tamaño grande.jpeg", "Santa Ana 137 de tamaño grande.jpeg", "Santa Ana 138 de tamaño grande.jpeg", "Santa Ana 139 de tamaño grande.jpeg", "Santa Ana 140 de tamaño grande.jpeg", "Santa Ana 141 de tamaño grande.jpeg", "Santa Ana 142 de tamaño grande.jpeg", "Santa Ana 143 de tamaño grande.jpeg", "Santa Ana 144 de tamaño grande.jpeg", "Santa Ana 145 de tamaño grande.jpeg", "Santa Ana 146 de tamaño grande.jpeg", "Santa Ana 147 de tamaño grande.jpeg", "Santa Ana 148 de tamaño grande.jpeg", "Santa Ana 149 de tamaño grande.jpeg", "Santa Ana 150 de tamaño grande.jpeg", "Santa Ana 151 de tamaño grande.jpeg", "Santa Ana 152 de tamaño grande.jpeg", "Santa Ana 155 de tamaño grande.jpeg", "Santa Ana de tamaño grande.jpeg"],
+      "Valle Grande": ["Valle Grande 21 de tamaño grande.jpeg", "Valle Grande 22 de tamaño grande.jpeg", "Valle Grande 25 de tamaño grande.jpeg", "Valle Grande 26 de tamaño grande.jpeg", "Valle Grande 48 de tamaño grande.jpeg", "Valle Grande 49 de tamaño grande.jpeg", "Valle Grande 50 de tamaño grande.jpeg", "Valle Grande 58 de tamaño grande.jpeg", "Valle Grande 59 de tamaño grande.jpeg", "Valle Grande 60 de tamaño grande.jpeg", "Valle Grande 61 de tamaño grande.jpeg", "Valle Grande 62 de tamaño grande.jpeg", "Valle Grande 63 de tamaño grande.jpeg", "Valle Grande 64 de tamaño grande.jpeg", "Valle Grande 81 de tamaño grande.jpeg", "Valle Grande 82 de tamaño grande.jpeg", "Valle Grande 83 de tamaño grande.jpeg", "Valle Grande 84 de tamaño grande.jpeg", "Valle Grande 86 de tamaño grande.jpeg", "Valle Grande 87 de tamaño grande.jpeg", "Valle Grande 88 de tamaño grande.jpeg", "Valle Grande 89 de tamaño grande.jpeg", "Valle Grande 90 de tamaño grande.jpeg", "Valle Grande 91 de tamaño grande.jpeg", "Valle Grande 92 de tamaño grande.jpeg", "Valle Grande 93 de tamaño grande.jpeg", "Valle Grande 94 de tamaño grande.jpeg", "Valle Grande 95 de tamaño grande.jpeg", "Valle Grande 96 de tamaño grande.jpeg", "Valle Grande 97 de tamaño grande.jpeg", "Valle Grande 98 de tamaño grande.jpeg", "Valle Grande 99 de tamaño grande.jpeg", "Valle Grande 102 de tamaño grande.jpeg", "Valle Grande 103 de tamaño grande.jpeg", "Valle Grande 105 de tamaño grande.jpeg", "Valle Grande 106 de tamaño grande.jpeg", "Valle Grande 107 de tamaño grande.jpeg", "Valle Grande 108 de tamaño grande.jpeg", "Valle Grande 109 de tamaño grande.jpeg", "Valle Grande 110 de tamaño grande.jpeg", "Valle Grande 111 de tamaño grande.jpeg", "Valle Grande 112 de tamaño grande.jpeg", "Valle Grande 113 de tamaño grande.jpeg"]
+    },
+    puna: {
+    }
+  };
+
+  regions = [
+    { id: 'quebrada', key: 'quebrada', name: 'Quebrada', es: 'Quebrada de Humahuaca', en: 'The Humahuaca gorge' },
+    { id: 'yungas',   key: 'yungas',   name: 'Yungas',   es: 'Selva de montaña',     en: 'Mountain cloud forest' },
+    { id: 'puna',     key: 'puna',     name: 'Puna',     es: 'Altiplano andino',     en: 'The Andean high plateau' }
+  ];
+
+  // Nombres lindos para carpetas con mayúsculas raras.
+  locNames = { HOrnocal: 'Hornocal', OCUMAZO: 'Ocumazo', Pucara: 'Pucará' };
+
+  // Fotos mostradas por localidad en cada visita (selección aleatoria).
+  perLocality = 8;
+
+  groups = [
+    { name: 'Saberes de la Quebrada', initials: 'SQ', url: 'https://saberesdelaquebrada.com.ar' },
+    { name: 'Red de Turismo Rural Valles de Altura', initials: 'VA', url: 'https://turismoruralvallesdealtura.com.ar' },
+    { name: 'Turismo Rural Maimará', initials: 'TM', url: 'https://turismoruralmaimara.com.ar' }
+  ];
+
+  copy = {
+    es: {
+      navMuestra: 'La muestra', navAutora: 'La fotógrafa',
+      kicker: 'Muestra fotográfica',
+      subtitle: 'Fotografías de Natalia Favre',
+      meta: '[ Museo Nacional Terry · 27/06 a 31/10 2026 ]',
+      curKicker: 'Sobre la muestra',
+      cur1: 'Los caminos de Jujuy constituyen hilos de un tejido vivo en el que se acumulan memorias, se transmiten saberes y se sostiene el vínculo entre las comunidades y su tierra. Las rutas de trashumancia, los senderos familiares y los caminos del turismo revelan diversas —y en ocasiones contradictorias— formas de habitar el territorio.',
+      cur2: 'Esta exposición reúne fotografías de Natalia Favre que invitan a un recorrido visual por distintos proyectos de turismo rural impulsados por comunidades de la Quebrada, la Puna y los Valles. El territorio se presenta aquí no como un destino fijo, sino como un espacio dinámico, atravesado por vínculos comunitarios y formas cotidianas de convivencia y crianza mutua con la naturaleza.',
+      photosWord: 'fotografías',
+      authorKicker: 'La fotógrafa',
+      authorRole: 'Fotógrafa documental',
+      authorBio: 'Natalia Favre — [texto de presentación a completar]. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.',
+      creditsKicker: 'Participantes',
+      creditsTitle: 'Participaron de este proyecto',
+      creditsIntro: 'Grupos de turismo rural de la Quebrada, los Valles y la Puna que hicieron posible este recorrido.',
+      visitWord: 'Visitar sitio',
+      footerNote: 'sitio en construcción · imágenes y textos de muestra',
+      untitled: 'Sin título', sinDatos: 'datos a completar',
+      emptyState: 'Fotografías en preparación'
+    },
+    en: {
+      navMuestra: 'The exhibition', navAutora: 'The photographer',
+      kicker: 'Photography exhibition',
+      subtitle: 'Photographs by Natalia Favre · Jujuy, Argentina',
+      meta: '[ Museum · exhibition dates — edit ]',
+      curKicker: 'About the exhibition',
+      cur1: 'The roads of Jujuy are threads of a living fabric in which memories accumulate, knowledge is passed on, and the bond between communities and their land is sustained. Transhumance routes, family paths and tourist trails reveal diverse —and at times contradictory— ways of inhabiting the territory.',
+      cur2: 'This exhibition brings together photographs by Natalia Favre that invite a visual journey through different rural tourism projects driven by communities of the Quebrada, the Puna and the Valles. The territory appears here not as a fixed destination, but as a dynamic space, crossed by community bonds and everyday forms of coexistence and mutual nurturing with nature.',
+      photosWord: 'photographs',
+      authorKicker: 'The photographer',
+      authorRole: 'Documentary photographer',
+      authorBio: 'Natalia Favre — [bio to be completed]. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.',
+      creditsKicker: 'Participants',
+      creditsTitle: 'Project participants',
+      creditsIntro: 'Rural tourism groups from the Quebrada, the Valles and the Puna who made this journey possible.',
+      visitWord: 'Visit site',
+      footerNote: 'site under construction · sample images and texts',
+      untitled: 'Untitled', sinDatos: 'details to be added',
+      emptyState: 'Photographs in preparation'
+    }
+  };
+
+  state = { lang: null, open: null };
+
+  // Random subset drawn ONCE per page load, then cached on the instance so it
+  // stays stable while the user navigates (language toggle, opening the carousel).
+  selection() {
+    if (this._sel) return this._sel;
+    const pick = (arr, n) => {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a.slice(0, n);
+    };
+    const out = {};
+    for (const r of this.regions) {
+      const locs = this.files[r.key] || {};
+      out[r.key] = Object.keys(locs)
+        .map((folder) => ({
+          folder,
+          name: this.locNames[folder] || folder,
+          list: pick(locs[folder], this.perLocality)
+        }))
+        .filter((l) => l.list.length);
+    }
+    this._sel = out;
+    return out;
+  }
+
+  componentDidMount() {
+    this._key = (e) => {
+      if (this.state.open == null) return;
+      if (e.key === 'Escape') this.setState({ open: null });
+      else if (e.key === 'ArrowLeft') this.scrollSlide(-1);
+      else if (e.key === 'ArrowRight') this.scrollSlide(1);
+    };
+    window.addEventListener('keydown', this._key);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this._key); }
+
+  // After opening, jump the scroll-snap track to the tapped slide.
+  componentDidUpdate() {
+    if (this._scrollTo != null) {
+      const el = document.getElementById('lb-track');
+      if (el) el.scrollLeft = this._scrollTo * el.clientWidth;
+      this._scrollTo = null;
+    }
+  }
+
+  scrollSlide(d) {
+    const el = document.getElementById('lb-track');
+    if (el) el.scrollBy({ left: d * el.clientWidth, behavior: 'smooth' });
+  }
+  openAt(i) { this._scrollTo = i; this.setState({ open: i }); }
+
+  renderVals() {
+    const accent = this.props.accentColor || '#c9a063';
+    const colW = this.props.minColumnWidth || 320;
+    const L = this.state.lang || this.props.defaultLang || 'es';
+    const t = this.copy[L];
+
+    const sel = this.selection();
+    let gi = 0;
+    const flat = [];
+    const sections = this.regions.map((r, ri) => {
+      const locs = sel[r.key] || [];
+      let regionCount = 0;
+      const localities = locs.map((loc) => {
+        const photos = loc.list.map((file) => {
+          const idx = gi++;
+          const rel = r.key + '/' + loc.folder + '/' + file;
+          const obj = {
+            gi: idx,
+            src: 'assets/images/' + encodeURI(rel),
+            alt: loc.name + ' — Natalia Favre',
+            region: r.name,
+            title: loc.name,
+            metaLine: r.name + ' · ' + loc.name,
+            counter: '',
+            open: () => this.openAt(idx)
+          };
+          flat.push(obj);
+          return obj;
+        });
+        regionCount += photos.length;
+        return { name: loc.name, count: photos.length + ' ' + t.photosWord, photos };
+      });
+      return {
+        id: r.id,
+        num: String(ri + 1).padStart(2, '0'),
+        name: r.name,
+        sub: r[L],
+        empty: localities.length === 0,
+        emptyLabel: t.emptyState,
+        countLabel: regionCount ? regionCount + ' ' + t.photosWord : '',
+        localities
+      };
+    });
+
+    flat.forEach((o) => { o.counter = (o.gi + 1) + ' / ' + flat.length; });
+
+    const open = this.state.open;
+    const current = open != null ? flat[open] : null;
+
+    const fn = {
+      setEs: () => this.setState({ lang: 'es' }),
+      setEn: () => this.setState({ lang: 'en' }),
+      close: () => this.setState({ open: null }),
+      stop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); },
+      prev: (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.scrollSlide(-1); },
+      next: (e) => { if (e && e.stopPropagation) e.stopPropagation(); this.scrollSlide(1); },
+      onScroll: (e) => {
+        const el = e.target;
+        if (!el || !el.clientWidth) return;
+        const idx = Math.round(el.scrollLeft / el.clientWidth);
+        if (idx !== this.state.open && idx >= 0 && idx < flat.length) this.setState({ open: idx });
+      },
+      imgError: (e) => { e.target.style.opacity = '0'; }
+    };
+
+    return {
+      t, sections, colW,
+      groups: this.groups,
+      esColor: L === 'es' ? accent : '#9a948a',
+      enColor: L === 'en' ? accent : '#9a948a',
+      isOpen: open != null,
+      slides: flat,
+      current,
+      fn
+    };
+  }
+}
+</script>
+</body>
+</html>
