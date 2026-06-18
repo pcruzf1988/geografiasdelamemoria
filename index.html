@@ -1,8 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- ============================ SEO ============================ -->
+<title>Geografías de la memoria — Natalia Favre · Muestra fotográfica · Jujuy</title>
+<meta name="description" content="Muestra fotográfica de Natalia Favre: un recorrido visual por proyectos de turismo rural comunitario de la Quebrada, las Yungas y la Puna de Jujuy. Museo Nacional Terry · 27/06 al 31/10 de 2026.">
+<meta name="author" content="Natalia Favre">
+<meta name="keywords" content="Natalia Favre, fotografía documental, Jujuy, Quebrada de Humahuaca, Yungas, Puna, turismo rural comunitario, muestra fotográfica, Museo Nacional Terry, geografías de la memoria">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0b0a09">
+<link rel="canonical" href="https://geografiasdelamemoria.com.ar/">
+
+<!-- Open Graph (Facebook, WhatsApp, etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Geografías de la memoria">
+<meta property="og:locale" content="es_AR">
+<meta property="og:title" content="Geografías de la memoria — Natalia Favre">
+<meta property="og:description" content="Recorrido visual por proyectos de turismo rural comunitario de la Quebrada, las Yungas y la Puna de Jujuy. Fotografías de Natalia Favre. Museo Nacional Terry, 2026.">
+<meta property="og:url" content="https://geografiasdelamemoria.com.ar/">
+<meta property="og:image" content="https://geografiasdelamemoria.com.ar/assets/images/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Geografías de la memoria — fotografías de Natalia Favre, Jujuy">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Geografías de la memoria — Natalia Favre">
+<meta name="twitter:description" content="Recorrido visual por proyectos de turismo rural comunitario de Jujuy. Fotografías de Natalia Favre. Museo Nacional Terry, 2026.">
+<meta name="twitter:image" content="https://geografiasdelamemoria.com.ar/assets/images/og-image.jpg">
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+
+<!-- Datos estructurados: la muestra como evento de artes visuales -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VisualArtsEvent",
+  "name": "Geografías de la memoria",
+  "description": "Muestra fotográfica de Natalia Favre: un recorrido visual por proyectos de turismo rural comunitario de la Quebrada, las Yungas y la Puna de Jujuy.",
+  "startDate": "2026-06-27",
+  "endDate": "2026-10-31",
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "image": "https://geografiasdelamemoria.com.ar/assets/images/og-image.jpg",
+  "url": "https://geografiasdelamemoria.com.ar/",
+  "location": {
+    "@type": "Place",
+    "name": "Museo Nacional Terry",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Tilcara",
+      "addressRegion": "Jujuy",
+      "addressCountry": "AR"
+    }
+  },
+  "performer": { "@type": "Person", "name": "Natalia Favre" }
+}
+</script>
+<!-- ========================== /SEO ============================= -->
+
 <!-- React vendored locally so the exhibition does not depend on a CDN (museum wifi safe).
      support.js skips its unpkg fetch when window.React already exists. -->
 <script src="./vendor/react.production.min.js"></script>
@@ -56,6 +116,11 @@
     .ig-link{display:inline-flex; align-items:center; gap:7px; color:#c9a063; text-decoration:none; transition:color .25s;}
     .ig-link:hover{color:#f3efe8;}
     .credit-card{display:flex; flex-direction:column; align-items:center; gap:14px; width:210px;}
+    /* Desktop: los 4 participantes en una sola fila */
+    @media (min-width:760px){
+      .credits-grid{flex-wrap:nowrap !important;}
+      .credits-grid .credit-card{width:auto; flex:1 1 0; min-width:0; max-width:240px;}
+    }
     .credit-badge{position:relative; width:88px; height:88px; border:1px solid rgba(232,228,221,0.22); border-radius:999px; overflow:hidden; display:flex; align-items:center; justify-content:center; transition:border-color .3s, background .3s;}
     .credit-card:hover .credit-badge{border-color:#c9a063; background:rgba(201,160,99,0.06);}
   </style>
@@ -80,7 +145,7 @@
 
   <header id="top" style="position:relative; min-height:92vh; display:flex; flex-direction:column; justify-content:flex-start; padding:clamp(84px,15vh,120px) clamp(28px,6vw,72px) clamp(28px,6vw,72px); margin-top:-57px; overflow:hidden;">
     <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#16130f 0,#16130f 13px,#110e0b 13px,#110e0b 26px);"></div>
-    <img src="assets/images/hero.jpg" alt="" onError="{{ fn.imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 60%; filter:brightness(0.62);" />
+    <img src="assets/images/hero.jpg" alt="Dos personas con sombrero miran el amanecer en la montaña — Geografías de la memoria, Natalia Favre, Jujuy" onError="{{ fn.imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 60%; filter:brightness(0.62);" />
     <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(11,10,9,0.82) 0%, rgba(11,10,9,0.30) 32%, rgba(11,10,9,0.12) 60%, rgba(11,10,9,0.6) 100%);"></div>
     <div style="position:relative; max-width:1180px; width:100%;">
       <div style="font-size:12px; letter-spacing:0.34em; text-transform:uppercase; color:#c9a063; margin-bottom:clamp(16px,3vw,26px);">{{ t.kicker }}</div>
@@ -191,7 +256,7 @@
     <div style="font-size:12px; letter-spacing:0.28em; text-transform:uppercase; color:#c9a063; margin-bottom:16px;">{{ t.creditsKicker }}</div>
     <h3 style="font-family:'Cormorant Garamond',serif; font-weight:400; font-size:clamp(28px,4vw,46px); line-height:1.05; margin:0 auto 16px; color:#f3efe8; max-width:18ch;">{{ t.creditsTitle }}</h3>
     <p style="font-size:15px; line-height:1.7; color:#9a948a; margin:0 auto 56px; max-width:56ch; text-wrap:pretty;">{{ t.creditsIntro }}</p>
-    <div style="display:flex; gap:clamp(24px,4vw,56px); justify-content:center; align-items:flex-start; flex-wrap:wrap; max-width:900px; margin:0 auto;">
+    <div class="credits-grid" style="display:flex; gap:clamp(20px,3vw,44px); justify-content:center; align-items:flex-start; flex-wrap:wrap; max-width:1040px; margin:0 auto;">
       <sc-for list="{{ groups }}" as="group" hint-placeholder-count="3">
         <div class="credit-card">
           <div class="credit-badge">
@@ -300,7 +365,7 @@ class Component extends DCLogic {
       navMuestra: 'La muestra', navAutora: 'La fotógrafa',
       kicker: 'Muestra fotográfica',
       subtitle: 'Fotografías de Natalia Favre',
-      meta: '[ Museo Nacional Terry · 27/06 a 31/10 2026 ]',
+      meta: '[Museo Nacional Terry · 27/06 a 31/10 2026]',
       curKicker: 'Sobre la muestra',
       cur1: 'Los caminos de Jujuy constituyen hilos de un tejido vivo en el que se acumulan memorias, se transmiten saberes y se sostiene el vínculo entre las comunidades y su tierra. Las rutas de trashumancia, los senderos familiares y los caminos del turismo revelan diversas —y en ocasiones contradictorias— formas de habitar el territorio.',
       cur2: 'Esta exposición reúne fotografías de Natalia Favre que invitan a un recorrido visual por distintos proyectos de turismo rural impulsados por comunidades de la Quebrada, la Puna y los Valles. El territorio se presenta aquí no como un destino fijo, sino como un espacio dinámico, atravesado por vínculos comunitarios y formas cotidianas de convivencia y crianza mutua con la naturaleza.',

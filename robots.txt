@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://geografiasdelamemoria.com.ar/sitemap.xml
